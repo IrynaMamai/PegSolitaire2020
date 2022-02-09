@@ -1,0 +1,226 @@
+﻿@using PegSolitaire.Core;
+@using PegSolitaireWeb.Models;
+@model PegSolitaireModel
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - PegSolitaire</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    
+</head>
+<body>
+
+
+    <h1>PegSolitaire</h1>
+
+    <div class="main-content">
+        <div class="left">
+            @if (!Model.Field.IsSolved() && !Model.Field.IsLosed())
+            {
+                <table class="field">
+
+                    @for (var row = 0; row < Model.Field.RowCount; row++)
+                    {
+                        <tr>
+                            @for (var column = 0; column < Model.Field.ColumnCount; column++)
+                            {
+                                var tile = Model.Field.GetTile(row, column);
+
+
+                                if (tile == State.CLOSED)
+                                {
+                                    <td>
+                                    </td>
+                                }
+                                else if (tile == State.EATEN)
+                                {
+                                    <td>
+                                        <a href="/PegSolitaire/Move?row=@(row)&column=@(column)&type=false&score=@(Model.Field.GetScore())" onclick="myFunction(@(row), @(column))">
+                                            <img id="@(row).@(column)"  class="pegSolitaire" src="~/images/peg-solitaire-emply.png" />
+                                        </a>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        <a href="/PegSolitaire/Move?row=@(row)&column=@(column)&type=true&score=@(Model.Field.GetScore())" onclick="myFunction(@(row), @(column))">
+                                            <img id="@(row).@(column)" class="pegSolitaire" src="~/images/peg-solitaire-circle.png" />
+                                        </a>
+                                    </td>
+
+                                }
+
+
+                            }
+                        </tr>
+
+                    }
+                </table>
+                <p>Your score: @Model.Field.GetScore()</p>
+
+
+            }
+            else if (Model.Field.IsSolved())
+            {
+                <div class="game_status">
+                    <img style="width:350px" src="~/images/jepa.jpg" />
+                    <h5>Сongratulations!! You won!!</h5>
+                </div>
+                <div class="win">
+                    <p>Your score: @Model.Field.Score</p>
+                    <form method="post" action="/PegSolitaire/AddScore">
+                        <div class="name">
+                            <label style=" display: contents" for="User_Name" class="col-sm-2 control-label">What is your name?</label>
+                            <br />
+                            <input type="text" name="User_Name" required spellcheck="true" autocomplete="on"></input>
+                        </div>
+                        <br />
+                        <div>
+
+                            <button type="submit" class="btn btn-danger">Submit</button>
+
+                        </div>
+                    </form>
+                </div>
+            }
+            else if (Model.Field.IsLosed())
+            {
+                <div class="game_status">
+                    <img style="width:350px" src="~/images/lose.jpg" />
+                </div>
+                <div>
+                    <p>Oh no, you lose. Try again!</p>
+                </div>
+            }
+        </div>
+        <div class="right">
+            <p class="new">New Game (choose map):</p>
+            <table class="links">
+                <tr>
+                    <td><a href="/PegSolitaire/Index?map=1"><img class="link" src="~/images/map_1.png" /></a></td>
+                    <td><a href="/PegSolitaire/Index?map=2"><img class="link" src="~/images/map_2.png" /></a></td>
+                    <td><a href="/PegSolitaire/Index?map=3"><img class="link" src="~/images/map_3.png" /></a></td>
+                </tr>
+
+                <tr>
+                    <td><a href="/PegSolitaire/Index?map=4"><img class="link" src="~/images/map_4.png" /></a></td>
+                    <td><a href="/PegSolitaire/Index?map=5"><img class="link" src="~/images/map_5.png" /></a></td>
+                    <td><a href="/PegSolitaire/Index?map=6"><img class="link" src="~/images/map_6.png" /></a></td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+    <div class="service">
+        <div class="left-service">
+            <p>Solved: @(Model.Field.IsSolved())</p>
+            <p>Message: @(Model.Message)</p>
+
+            <p>Scores:</p>
+            <ol>
+                @foreach (var score in Model.Scores)
+                {
+                    <li>@(score.Name): @(score.Points)</li>
+                }
+            </ol>
+
+
+            <p>Average rating:  @Math.Round(Model.AverageRatin, 2)</p>
+
+
+            <br />
+            <br />
+            <p class="c">You can add comment:</p>
+            <form method="post" action="/PegSolitaire/AddCommentAndRating">
+                <div class="rate">
+
+                    <div>
+                        <input type="radio" id="5" value="5" name="Star" checked>
+                        <label for="5">Сhoose this -> <img class="star" src="~/images/Star5.jpg" alt="Star5" /></label>
+                    </div>
+                    <div>
+                        <input type="radio" id="4" value="4" name="Star">
+                        <label for="4">Not bad <img class="star" src="~/images/Star4.jpg" alt="Star4" /></label>
+                    </div>
+                    <div>
+                        <input type="radio" id="3" value="3" name="Star">
+                        <label for="3">You can try <img class="star" src="~/images/Star3.jpg" alt="Star3" /></label>
+                    </div>
+                    <div>
+                        <input type="radio" id="2" value="2" name="Star">
+                        <label for="2">Everything is so bad, huh? <img class="star" src="~/images/Star2.jpg" alt="Star2" /></label>
+                    </div>
+                    <div>
+                        <input type="radio" id="1" value="1" name="Star">
+                        <label for="1">Oh no, not this one <img class="star" src="~/images/Star1.jpg" alt="Star1" /></label>
+                    </div>
+
+                </div>
+
+                <br />
+                <div>
+                    <label for="User_Name" class="col-sm-2 control-label">What is your name?</label>
+                    <input type="text" class="form-control" name="User_Name" required spellcheck="true" autocomplete="on"></input>
+
+                </div>
+                <br />
+                <div>
+                    <label for="Comment" class="col-sm-2 control-label">Add comment</label>
+                    <textarea type="text" class="form-control" name="Comment" rows="5" cols="33" required spellcheck="true" autocomplete="on"></textarea>
+
+                </div>
+                <br />
+                <div>
+                    <button type="submit" class="btn btn-danger">Submit</button>
+                </div>
+            </form>
+        </div>
+        <div class="right-service">
+            <p class="c">Comments:</p>
+            @foreach (var comment in Model.Comments)
+            {
+                <p>
+                    by @(comment.Name)
+                    <br />
+                    comment: @(comment.Comments)
+                </p>
+                <br />
+            }
+        </div>
+    </div>
+
+
+
+  
+
+
+
+
+
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+
+
+
+    <script src="~/js/js.js" asp-append-version="true"></script>
+</body>
+</html>
